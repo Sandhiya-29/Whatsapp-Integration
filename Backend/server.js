@@ -17,8 +17,8 @@ const authToken = process.env.AUTH_TOKEN;
 const twilioWhatsAppNumber = 'whatsapp:+14155238886'; // Replace with your Twilio WhatsApp number
 const client = twilio(accountSid, authToken);
 
-// Webhook for receiving messages
-app.post('/webhook', (req, res) => {
+// Webhook to receive incoming messages
+app.post('/webhook', async (req, res) => {
     const from = req.body.From; // Sender's WhatsApp number
     const messageBody = req.body.Body; // Message content
 
@@ -29,31 +29,29 @@ app.post('/webhook', (req, res) => {
 
     console.log(`Message received from ${from}: ${messageBody}`);
 
-    // Prepare a reply based on the incoming message
     let reply;
+    // Respond to different messages
     if (messageBody.toLowerCase() === 'hello') {
-        reply = "Hi there! How can I help you today?";
-    } else if (messageBody.toLowerCase() === 'status') {
-        reply = "Your application status is: Approved ✅";
+        reply = 'Hello! How can I assist you today?';
+    } else if (messageBody.toLowerCase() === 'bye') {
+        reply = 'Goodbye! Have a great day!';
     } else {
-        reply = "Sorry, I didn't understand that. Please type 'hello' or 'status' for assistance.";
+        reply = "I am not sure how to respond to that. Please try again.";
     }
 
-    // Send the reply to the sender
-    client.messages
-        .create({
-            from: from, // Twilio WhatsApp number
-            to: twilioWhatsAppNumber, // Respond to the sender's WhatsApp number
-            body: reply,
-        })
-        .then((message) => {
-            console.log(`Message sent to ${from} with SID: ${message.sid}`);
-            res.status(200).send('Reply sent successfully!');
-        })
-        .catch((error) => {
-            console.error('Error sending reply:', error.message);
-            res.status(500).send('Failed to send reply.');
+    // Send the reply to the sender/
+    try {
+        await client.messages.create({
+            from: twilioWhatsAppNumber, // Twilio WhatsApp number
+            to: from, // Sender's WhatsApp number
+            body: reply, // The response message
         });
+        console.log(`Reply sent to ${from}: ${reply}`);
+        res.status(200).send('Reply sent successfully!');
+    } catch (error) {
+        console.error('Error sending reply:', error.message);
+        res.status(500).send('Failed to send reply.');
+    }
 });
 
 // Route to manually send messages to multiple numbers
