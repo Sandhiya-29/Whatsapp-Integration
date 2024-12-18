@@ -70,7 +70,6 @@ app.post('/send-whatsapp', (req, res) => {
         })
     );
 
-    
     Promise.all(promises)
         .then((results) => {
             console.log('Messages sent:', results.map((msg) => msg.sid));
