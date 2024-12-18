@@ -14,7 +14,7 @@ app.use(express.json()); // For parsing JSON requests
 // Twilio Credentials
 const accountSid = process.env.ACCOUNT_SID;
 const authToken = process.env.AUTH_TOKEN;
-const twilioWhatsAppNumber = 'whatsapp:+14155238886'; // Replace with your Twilio WhatsApp number
+const twilioWhatsAppNumber = 'whatsapp:+14155238886'; 
 const client = twilio(accountSid, authToken);
 
 // Webhook to receive incoming messages
@@ -42,9 +42,9 @@ app.post('/webhook', async (req, res) => {
     // Send the reply to the sender/
     try {
         await client.messages.create({
-            from: twilioWhatsAppNumber, // Twilio WhatsApp number
-            to: from, // Sender's WhatsApp number
-            body: reply, // The response message
+            from: twilioWhatsAppNumber, 
+            to: from, 
+            body: reply, 
         });
         console.log(`Reply sent to ${from}: ${reply}`);
         res.status(200).send('Reply sent successfully!');
@@ -54,7 +54,7 @@ app.post('/webhook', async (req, res) => {
     }
 });
 
-// Route to manually send messages to multiple numbers
+
 app.post('/send-whatsapp', (req, res) => {
     const { numbers, message } = req.body;
 
@@ -64,13 +64,13 @@ app.post('/send-whatsapp', (req, res) => {
 
     const promises = numbers.map((number) =>
         client.messages.create({
-            from: twilioWhatsAppNumber, // Twilio WhatsApp number
-            to: `whatsapp:${number}`, // Recipient's WhatsApp number
+            from: twilioWhatsAppNumber, 
+            to: `whatsapp:${number}`, 
             body: message,
         })
     );
 
-    // Wait for all messages to be sent
+    
     Promise.all(promises)
         .then((results) => {
             console.log('Messages sent:', results.map((msg) => msg.sid));
@@ -82,7 +82,7 @@ app.post('/send-whatsapp', (req, res) => {
         });
 });
 
-// Start the server
+
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
